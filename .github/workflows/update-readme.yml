@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: write   # lets the Action commit the updated README
-  models: read      # lets it use GitHub Models for the AI hot take (free, no API key)
 
 jobs:
   update:
@@ -25,6 +24,7 @@ jobs:
       - name: Update README
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}   # your Gemini key, stored as a repo secret
         run: python scripts/update_readme.py
 
       - name: Commit changes

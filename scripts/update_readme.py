@@ -11,24 +11,17 @@ Runs in GitHub Actions. Uses only the Python standard library.
 import json
 import os
 import re
+import urllib.error
 import urllib.request
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 USER = os.environ.get("GITHUB_REPOSITORY_OWNER", "your-username")
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
-MODEL = os.environ.get("AI_MODEL", "openai/gpt-4.1-mini")
+AI_KEY = os.environ.get("AI_API_KEY", "")
+AI_BASE = os.environ.get("AI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai").rstrip("/")
+AI_MODEL = os.environ.get("AI_MODEL", "gemini-flash-latest")
 README = "README.md"
-
-
-class KeepPostRedirect(urllib.request.HTTPRedirectHandler):
-    """Python's default turns a redirected POST into a GET and drops the body. Keep it a POST."""
-
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        print(f"Redirected ({code}) to {newurl}")
-        return urllib.request.Request(
-            newurl, data=req.data, headers=dict(req.header_items()), method=req.get_method()
-        )
 
 
 def get_json(url, headers=None, data=None):
@@ -87,6 +80,18 @@ def top_tech_news(n=5):
     return stories
 
 
+def candidate_models(headers):
+    """Try your chosen model first, then any 'flash' model the API lists (names change often)."""
+    models = [AI_MODEL]
+    try:
+        listed = get_json(f"{AI_BASE}/models", headers)
+        ids = [m["id"].removeprefix("models/") for m in listed.get("data", [])]
+        models += [m for m in ids if "flash" in m and "image" not in m and "tts" not in m][:3]
+    except Exception as e:
+        print(f"Could not list models: {e}")
+    return list(dict.fromkeys(models))
+
+
 def hot_take():
     stories = top_tech_news()
     headlines = "\n".join(f"{i+1}. {s['title']}" for i, s in enumerate(stories))
@@ -96,24 +101,27 @@ def hot_take():
         "opinion on it in 2 sentences max. No hashtags, no emojis, no em dashes. "
         "Reply as JSON: {\"pick\": <headline number>, \"take\": \"...\"}\n\n" + headlines
     )
-    body = json.dumps({
-        "model": MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.9,
-    }).encode()
-    headers = {
-        "Authorization": f"Bearer {TOKEN}",
-        "Content-Type": "application/json",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
-    url = "https://models.github.ai/inference/chat/completions"
-    opener = urllib.request.build_opener(KeepPostRedirect)
-    req = urllib.request.Request(url, headers=headers, data=body, method="POST")
-    with opener.open(req, timeout=60) as r:
-        raw = r.read().decode()
-        print(f"AI status {r.status} from {r.geturl()}")
-    print("AI raw response:", raw[:500])
+    if not AI_KEY:
+        raise ValueError("AI_API_KEY secret is not set")
+    headers = {"Authorization": f"Bearer {AI_KEY}", "Content-Type": "application/json"}
+    raw = None
+    for model in candidate_models(headers):
+        body = json.dumps({
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.9,
+        }).encode()
+        req = urllib.request.Request(f"{AI_BASE}/chat/completions", headers=headers, data=body)
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                raw = r.read().decode()
+            print(f"AI model used: {model}")
+            break
+        except urllib.error.HTTPError as e:
+            print(f"Model {model} failed: {e.code} {e.read().decode()[:200]}")
+    if raw is None:
+        raise ValueError("no model worked")
+    print("AI raw response:", raw[:300])
     text = json.loads(raw)["choices"][0]["message"]["content"].strip()
 
     # Models don't always return clean JSON, so dig it out, or fall back to plain text.
