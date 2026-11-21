@@ -91,13 +91,33 @@ def hot_take():
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.9,
     }).encode()
-    headers = {"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json"}
-    resp = get_json("https://models.github.ai/inference/chat/completions", headers, body)
-    text = resp["choices"][0]["message"]["content"].strip()
-    text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    result = json.loads(text)
-    story = stories[int(result["pick"]) - 1]
-    return f"> {result['take']}\n>\n> *Re: [{story['title']}]({story['url']})*"
+    headers = {
+        "Authorization": f"Bearer {TOKEN}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    req = urllib.request.Request(
+        "https://models.github.ai/inference/chat/completions", headers=headers, data=body
+    )
+    with urllib.request.urlopen(req, timeout=60) as r:
+        raw = r.read().decode()
+    print("AI raw response:", raw[:500])
+    text = json.loads(raw)["choices"][0]["message"]["content"].strip()
+
+    # Models don't always return clean JSON, so dig it out, or fall back to plain text.
+    pick, take = 1, text
+    match = re.search(r"\{.*\}", text, re.S)
+    if match:
+        try:
+            result = json.loads(match.group(0))
+            pick, take = int(result.get("pick", 1)), result.get("take", text)
+        except (json.JSONDecodeError, ValueError):
+            pass
+    take = take.replace("—", ",").strip().strip('"')
+    if not take:
+        raise ValueError("empty take")
+    story = stories[min(max(pick, 1), len(stories)) - 1]
+    return f"> {take}\n>\n> *Re: [{story['title']}]({story['url']})*"
 
 
 def replace_section(content, name, new_text):
