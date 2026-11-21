@@ -21,6 +21,16 @@ MODEL = os.environ.get("AI_MODEL", "openai/gpt-4.1-mini")
 README = "README.md"
 
 
+class KeepPostRedirect(urllib.request.HTTPRedirectHandler):
+    """Python's default turns a redirected POST into a GET and drops the body. Keep it a POST."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        print(f"Redirected ({code}) to {newurl}")
+        return urllib.request.Request(
+            newurl, data=req.data, headers=dict(req.header_items()), method=req.get_method()
+        )
+
+
 def get_json(url, headers=None, data=None):
     req = urllib.request.Request(url, headers=headers or {}, data=data)
     with urllib.request.urlopen(req, timeout=30) as resp:
@@ -94,13 +104,15 @@ def hot_take():
     headers = {
         "Authorization": f"Bearer {TOKEN}",
         "Content-Type": "application/json",
-        "Accept": "application/json",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
     }
-    req = urllib.request.Request(
-        "https://models.github.ai/inference/chat/completions", headers=headers, data=body
-    )
-    with urllib.request.urlopen(req, timeout=60) as r:
+    url = "https://models.github.ai/inference/chat/completions"
+    opener = urllib.request.build_opener(KeepPostRedirect)
+    req = urllib.request.Request(url, headers=headers, data=body, method="POST")
+    with opener.open(req, timeout=60) as r:
         raw = r.read().decode()
+        print(f"AI status {r.status} from {r.geturl()}")
     print("AI raw response:", raw[:500])
     text = json.loads(raw)["choices"][0]["message"]["content"].strip()
 
