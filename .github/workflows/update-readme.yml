@@ -1,0 +1,36 @@
+name: Update README
+
+on:
+  schedule:
+    - cron: "17 13 * * *"   # every day around 7:17 AM Central (13:17 UTC)
+  workflow_dispatch:         # adds a "Run workflow" button so you can trigger it manually
+  push:
+    paths:
+      - learning.json        # re-run whenever you edit what you're learning
+
+permissions:
+  contents: write   # lets the Action commit the updated README
+  models: read      # lets it use GitHub Models for the AI hot take (free, no API key)
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Update README
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/update_readme.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "readme-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --staged --quiet || git commit -m "Auto-update README"
+          git push
