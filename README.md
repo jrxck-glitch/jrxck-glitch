@@ -6,9 +6,9 @@ Senior CS @ Jackson State University. Building with machine learning, cybersecur
 
 ### 🔥 Daily Hot Take
 <!-- HOTTAKE:START -->
-> If a math genius actually just solved the Riemann Hypothesis on a random PDF, my operating system is about to instantly self-destruct from sheer embarrassment. Time to drop out and become a shepherd.
+> Finally, a realistic simulator for the modern junior developer onboarding experience. I cannot wait to speedrun hallucinating fake APIs just to watch the orchestrator panic.
 >
-> *Re: [Levent Alpöge claims proof of the Generalized Riemann Hypothesis [pdf]](https://alpo.ge/remark.pdf)*
+> *Re: [Show HN: I built a game where you are an LLM's subagent](https://github.com/gulivan/worker755)*
 <!-- HOTTAKE:END -->
 
 ### 🛠️ Latest Commits
@@ -26,5 +26,5 @@ Senior CS @ Jackson State University. Building with machine learning, cybersecur
 
 ---
 <!-- UPDATED:START -->
-<sub>Auto-updated Nov 21, 2026 at 02:10 PM CT by a GitHub Action</sub>
+<sub>Auto-updated Nov 22, 2026 at 02:24 PM CT by a GitHub Action</sub>
 <!-- UPDATED:END -->
