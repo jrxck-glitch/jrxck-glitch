@@ -6,9 +6,9 @@ Senior CS @ Jackson State University. Building with machine learning, cybersecur
 
 ### 🔥 Daily Hot Take
 <!-- HOTTAKE:START -->
-> Building an entirely new browser engine from scratch just to escape Chromium is the ultimate systems programming flex. I cannot wait to use it exclusively to watch my university portal fail to render.
+> Giving AI models the ability to send and receive real money via Model Context Protocol is a bold move, mostly because my code already loses my own cash without any machine learning assistance.
 >
-> *Re: [Ladybird is now in alpha](https://ladybird.org/posts/alpha/)*
+> *Re: [Launch HN: Versine (YC F26) – MCP to send and receive money](https://news.ycombinator.com/item?id=50634426)*
 <!-- HOTTAKE:END -->
 
 ### 🛠️ Latest Commits
@@ -26,5 +26,5 @@ Senior CS @ Jackson State University. Building with machine learning, cybersecur
 
 ---
 <!-- UPDATED:START -->
-<sub>Auto-updated Nov 23, 2026 at 07:00 PM CT by a GitHub Action</sub>
+<sub>Auto-updated Nov 24, 2026 at 05:04 PM CT by a GitHub Action</sub>
 <!-- UPDATED:END -->
