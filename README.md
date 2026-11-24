@@ -6,9 +6,9 @@ Senior CS @ Jackson State University. Building with machine learning, cybersecur
 
 ### 🔥 Daily Hot Take
 <!-- HOTTAKE:START -->
-> Finally, a realistic simulator for the modern junior developer onboarding experience. I cannot wait to speedrun hallucinating fake APIs just to watch the orchestrator panic.
+> Building an entirely new browser engine from scratch just to escape Chromium is the ultimate systems programming flex. I cannot wait to use it exclusively to watch my university portal fail to render.
 >
-> *Re: [Show HN: I built a game where you are an LLM's subagent](https://github.com/gulivan/worker755)*
+> *Re: [Ladybird is now in alpha](https://ladybird.org/posts/alpha/)*
 <!-- HOTTAKE:END -->
 
 ### 🛠️ Latest Commits
@@ -26,5 +26,5 @@ Senior CS @ Jackson State University. Building with machine learning, cybersecur
 
 ---
 <!-- UPDATED:START -->
-<sub>Auto-updated Nov 22, 2026 at 02:24 PM CT by a GitHub Action</sub>
+<sub>Auto-updated Nov 23, 2026 at 07:00 PM CT by a GitHub Action</sub>
 <!-- UPDATED:END -->
